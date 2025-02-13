@@ -4,101 +4,65 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use App\Models\AbstractionQuiz;
-use App\Models\PolymorphismQuiz;
-use App\Models\InheritanceQuiz;
-use App\Models\EncapsulationQuiz;
-use App\Models\IntroductionToJavaQuiz;
-use App\Models\IntroductionToOopQuiz;
+use App\Models\Quiz;
 
-class QuizController extends Controller
+
+class QuizController extends Controller{
+    public function getQuizzes($category = null): JsonResponse
+    {
+        $query = Quiz::query();
+        
+        if ($category) {
+            $query->where('category', $category);
+        }
+        
+        return response()->json($query->get());
+    }
+
+    public function addQuiz(Request $request, $category): JsonResponse
 {
-    public function getAbstractionQuizzes(): JsonResponse
-    {
-        $quizzes = AbstractionQuiz::all();
-        return response()->json($quizzes);
-    }
+    // Validate required fields
+    $request->validate([
+        'question' => 'required|string',
+        'a' => 'required|string',
+        'b' => 'required|string',
+        'c' => 'required|string',
+        'd' => 'required|string',
+        'correct' => 'required|string'
+    ]);
 
-    public function getPolymorphismQuizzes(): JsonResponse
-    {
-        $quizzes = PolymorphismQuiz::all();
-        return response()->json($quizzes);
-    }
+    // Include the category from the URL
+    $quizData = $request->all();
+    $quizData['category'] = $category;
 
-    public function getInheritanceQuizzes(): JsonResponse
-    {
-        $quizzes = InheritanceQuiz::all();
-        return response()->json($quizzes);
-    }
+    // Create quiz using the single Quiz model
+    $quiz = Quiz::create($quizData);
 
-    public function getEncapsulationQuizzes(): JsonResponse
-    {
-        $quizzes = EncapsulationQuiz::all();
-        return response()->json($quizzes);
-    }
+    return response()->json($quiz, 201);
+}
 
-    public function getIntroductionToJavaQuizzes(): JsonResponse
+    public function updateQuiz(Request $request, $category, $id): JsonResponse
     {
-        $quizzes = IntroductionToJavaQuiz::all();
-        return response()->json($quizzes);
-    }
-
-    public function getIntroductionToOopQuizzes(): JsonResponse
-    {
-        $quizzes = IntroductionToOopQuiz::all();
-        return response()->json($quizzes);
-    }
-    
-    private $models = [
-        'abstraction' => AbstractionQuiz::class,
-        'polymorphism' => PolymorphismQuiz::class,
-        'inheritance' => InheritanceQuiz::class,
-        'encapsulation' => EncapsulationQuiz::class,
-        'introductionToJava' => IntroductionToJavaQuiz::class,
-        'introductionToOop' => IntroductionToOopQuiz::class,
-    ];
-
-    public function getQuizzes($type): JsonResponse
-    {
-        if (!isset($this->models[$type])) {
-            return response()->json(['error' => 'Invalid quiz type'], 400);
-        }
-        return response()->json($this->models[$type]::all());
-    }
-
-    public function addQuiz(Request $request, $type): JsonResponse
-    {
-        if (!isset($this->models[$type])) {
-            return response()->json(['error' => 'Invalid quiz type'], 400);
-        }
-        $quiz = $this->models[$type]::create($request->all());
-        return response()->json($quiz, 201);
-    }
-
-    public function updateQuiz(Request $request, $type, $id): JsonResponse
-    {
-        if (!isset($this->models[$type])) {
-            return response()->json(['error' => 'Invalid quiz type'], 400);
-        }
-        $quiz = $this->models[$type]::find($id);
+        $quiz = Quiz::where('id', $id)->where('category', $category)->first();
         if (!$quiz) {
             return response()->json(['error' => 'Quiz not found'], 404);
         }
+        
         $quiz->update($request->all());
         return response()->json($quiz);
     }
 
-    public function deleteQuiz($type, $id): JsonResponse
+    // public function deleteQuiz($id): JsonResponse
+    public function deleteQuiz(Request $request): JsonResponse
     {
-        if (!isset($this->models[$type])) {
-            return response()->json(['error' => 'Invalid quiz type'], 400);
-        }
-        $quiz = $this->models[$type]::find($id);
+        $quiz = Quiz::where('id', $request->id)
+        ->where('category', $request->category)
+        ->first();        
         if (!$quiz) {
             return response()->json(['error' => 'Quiz not found'], 404);
         }
+        
         $quiz->delete();
         return response()->json(['message' => 'Quiz deleted successfully']);
     }
 }
-

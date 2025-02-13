@@ -20,13 +20,14 @@ class DatabaseSeeder extends Seeder
         // ]);
 
         $this->call([
-            IntroductionToJavaQuizSeeder::class,
-            IntroductionToOopQuizSeeder::class,
-            InheritanceQuizSeeder::class,
-            PolymorphismQuizSeeder::class,
-            AbstractionQuizSeeder::class,
-            EncapsulationQuizSeeder::class,
+            // IntroductionToJavaQuizSeeder::class,
+            // IntroductionToOopQuizSeeder::class,
+            // InheritanceQuizSeeder::class,
+            // PolymorphismQuizSeeder::class,
+            // AbstractionQuizSeeder::class,
+            // EncapsulationQuizSeeder::class,
             AdminUserSeeder::class,
+            QuizSeeder::class
         ]);
     }
 }

@@ -35,23 +35,59 @@ Route::middleware('jwt.auth')->group(function () {
     Route::get('/lesson-progress-admin', [LessonProgressController::class, 'getProgressAdmin']);
 });
 
+// Route::middleware('jwt.auth')->group(function () {
+//     Route::get('/quiz-scores', [QuizScoreController::class, 'getScores']);
+//     Route::post('/quiz-scores', [QuizScoreController::class, 'saveScore']);
+//     Route::get('/quiz-scores/{quizId}', [QuizScoreController::class, 'getCurrentScore']);
+// });
+
+// Route::middleware('jwt.auth')->group(function () {
+//     Route::get('/admin/{type}-quizzes', [QuizController::class, 'getQuizzes']);
+//     Route::post('/admin/{type}-quizzes', [QuizController::class, 'addQuiz']);
+//     Route::put('/admin/{type}-quizzes/{id}', [QuizController::class, 'updateQuiz']);
+//     Route::delete('/admin/{type}-quizzes/{id}', [QuizController::class, 'deleteQuiz']);
+// });
+
+// // LESSONS QUIZ ROUTES
+// Route::get('abstraction-quizzes', [QuizController::class, 'getAbstractionQuizzes']);
+// Route::get('polymorphism-quizzes', [QuizController::class, 'getPolymorphismQuizzes']);
+// Route::get('inheritance-quizzes', [QuizController::class, 'getInheritanceQuizzes']);
+// Route::get('encapsulation-quizzes', [QuizController::class, 'getEncapsulationQuizzes']);
+// Route::get('introductionToJava-quizzes', [QuizController::class, 'getIntroductionToJavaQuizzes']);
+// Route::get('introductionToOop-quizzes', [QuizController::class, 'getIntroductionToOopQuizzes']);
+
+// Route::middleware('jwt.auth')->prefix('admin')->group(function () {
+//     Route::prefix('quizzes')->group(function () {
+//         Route::get('/{category}', [QuizController::class, 'getQuizzes']);
+//         Route::post('/{category}', [QuizController::class, 'addQuiz']);
+//         Route::put('/{category}/{id}', [QuizController::class, 'updateQuiz']);
+//         Route::delete('/{category}/{id}', [QuizController::class, 'deleteQuiz']);
+//     });
+// });
+
+// // Public lesson quiz routes
+// Route::prefix('quizzes')->group(function () {
+//     Route::get('/{category}', [QuizController::class, 'getQuizzes']);
+// });
+
+// 📌 Routes for quiz scores (REQUIRES JWT AUTH)
 Route::middleware('jwt.auth')->group(function () {
     Route::get('/quiz-scores', [QuizScoreController::class, 'getScores']);
     Route::post('/quiz-scores', [QuizScoreController::class, 'saveScore']);
     Route::get('/quiz-scores/{quizId}', [QuizScoreController::class, 'getCurrentScore']);
 });
 
-Route::middleware('jwt.auth')->group(function () {
-    Route::get('/admin/{type}-quizzes', [QuizController::class, 'getQuizzes']);
-    Route::post('/admin/{type}-quizzes', [QuizController::class, 'addQuiz']);
-    Route::put('/admin/{type}-quizzes/{id}', [QuizController::class, 'updateQuiz']);
-    Route::delete('/admin/{type}-quizzes/{id}', [QuizController::class, 'deleteQuiz']);
+// 📌 Admin Routes (REQUIRES JWT AUTH)
+Route::middleware('jwt.auth')->prefix('admin')->group(function () {
+    Route::prefix('quizzes')->group(function () {
+        Route::get('/{category}', [QuizController::class, 'getQuizzes']);  // Get quizzes by category
+        Route::post('/{category}', [QuizController::class, 'addQuiz']);    // Add a new quiz
+        Route::put('/{category}/{id}', [QuizController::class, 'updateQuiz']);  // Update quiz
+        Route::delete('/{category}/{id}', [QuizController::class, 'deleteQuiz']);  // Delete quiz
+    });
 });
 
-// LESSONS QUIZ ROUTES
-Route::get('abstraction-quizzes', [QuizController::class, 'getAbstractionQuizzes']);
-Route::get('polymorphism-quizzes', [QuizController::class, 'getPolymorphismQuizzes']);
-Route::get('inheritance-quizzes', [QuizController::class, 'getInheritanceQuizzes']);
-Route::get('encapsulation-quizzes', [QuizController::class, 'getEncapsulationQuizzes']);
-Route::get('introductionToJava-quizzes', [QuizController::class, 'getIntroductionToJavaQuizzes']);
-Route::get('introductionToOop-quizzes', [QuizController::class, 'getIntroductionToOopQuizzes']);
+// 📌 Public Routes (DOES NOT REQUIRE JWT AUTH)
+Route::prefix('quizzes')->group(function () {
+    Route::get('/{category}', [QuizController::class, 'getQuizzes']);  // Fetch quizzes by category
+});
